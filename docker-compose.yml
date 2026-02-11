@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: projet_fire_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: projet_fire
+      POSTGRES_USER: projet_fire_user
+      POSTGRES_PASSWORD: projet_fire_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

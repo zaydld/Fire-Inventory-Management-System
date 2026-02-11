@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+sqlalchemy
+psycopg[binary]
+pydantic-settings
+python-dotenv
+passlib[bcrypt]
+bcrypt<4.1.0
+python-jose[cryptography]
+strawberry-graphql[fastapi]
