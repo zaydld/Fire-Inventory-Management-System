@@ -1,9 +1,16 @@
-<mat-toolbar color="primary">
-  <span>Fire Inventory</span>
-  <span style="flex: 1 1 auto;"></span>
-  <button mat-raised-button color="accent">Login</button>
-</mat-toolbar>
+@if (showToolbar) {
+  <mat-toolbar color="primary">
+    <span class="font-semibold">Fire Inventory</span>
+    <span class="flex-1"></span>
+
+    @if (isLoggedIn()) {
+      <button mat-raised-button color="accent" (click)="logout()">
+        Logout
+      </button>
+    }
+  </mat-toolbar>
+}
 
 <div class="p-6">
-  <button mat-raised-button color="primary">Material Button 🚀</button>
+  <router-outlet></router-outlet>
 </div>
