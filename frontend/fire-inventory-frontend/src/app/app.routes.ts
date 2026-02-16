@@ -4,6 +4,7 @@ import { authGuard } from './core/auth.guard';
 import { MainLayoutComponent } from './layout/main-layout.component';
 
 import { ProductsPageComponent } from './pages/products.page';
+import { ProductCreatePageComponent } from './pages/product-create.page';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
@@ -14,9 +15,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: 'products', component: ProductsPageComponent },
-
-     
-
+      { path: 'products/new', component: ProductCreatePageComponent },
       { path: '', redirectTo: 'products', pathMatch: 'full' },
     ],
   },
