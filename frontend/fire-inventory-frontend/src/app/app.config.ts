@@ -12,10 +12,6 @@ import { environment } from '../environments/environment';
 // Material
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatCardModule } from '@angular/material/card';
 
 // Apollo
 import { ApolloLink, InMemoryCache } from '@apollo/client/core';
@@ -33,43 +29,38 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(),
 
-    // ✅ Material modules used across the app
-    importProvidersFrom(
-      MatToolbarModule,
-      MatButtonModule,
-      MatFormFieldModule,
-      MatInputModule,
-      MatSnackBarModule,
-      MatCardModule
-    ),
+    importProvidersFrom(MatToolbarModule, MatButtonModule),
 
     provideApollo(() => {
-      const http = createHttpLink({
-        uri: environment.graphqlUri,
+      const httpLink = createHttpLink({
+        uri: environment.graphqlUri, // '/graphql' via proxy
         fetch,
       });
 
+      // ✅ Typage safe: on prend err en any (évite ErrorHandlerOptions)
       const errorLink = onError((err: any) => {
         const networkError = err?.networkError;
-        if (networkError) console.error('Network error', networkError);
-
         const graphQLErrors = err?.graphQLErrors;
+
+        if (networkError) console.error('Network error', networkError);
         if (graphQLErrors?.length) console.error('GraphQL errors', graphQLErrors);
       });
 
-      // ✅ US-7.2: attach JWT if exists
-      const authLink = setContext((_, { headers }) => {
+      // ✅ TS strict: ctx['headers'] au lieu de ctx.headers
+      const authLink = setContext((_, ctx: any) => {
         const token = getToken();
+        const prevHeaders = (ctx?.['headers'] ?? {}) as Record<string, string>;
+
         return {
           headers: {
-            ...headers,
+            ...prevHeaders,
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
         };
       });
 
       return {
-        link: ApolloLink.from([errorLink, authLink, http]),
+        link: ApolloLink.from([errorLink, authLink, httpLink]),
         cache: new InMemoryCache(),
       };
     }),

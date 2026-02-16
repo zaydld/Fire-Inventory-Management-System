@@ -1,16 +1,1 @@
-@if (showToolbar) {
-  <mat-toolbar color="primary">
-    <span class="font-semibold">Fire Inventory</span>
-    <span class="flex-1"></span>
-
-    @if (isLoggedIn()) {
-      <button mat-raised-button color="accent" (click)="logout()">
-        Logout
-      </button>
-    }
-  </mat-toolbar>
-}
-
-<div class="p-6">
-  <router-outlet></router-outlet>
-</div>
+<router-outlet />
