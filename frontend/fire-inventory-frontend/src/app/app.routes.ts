@@ -5,6 +5,7 @@ import { MainLayoutComponent } from './layout/main-layout.component';
 
 import { ProductsPageComponent } from './pages/products.page';
 import { ProductCreatePageComponent } from './pages/product-create.page';
+import { ProductEditPageComponent } from './pages/product-edit.page';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
@@ -16,6 +17,8 @@ export const routes: Routes = [
     children: [
       { path: 'products', component: ProductsPageComponent },
       { path: 'products/new', component: ProductCreatePageComponent },
+      { path: 'products/:id/edit', component: ProductEditPageComponent },
+
       { path: '', redirectTo: 'products', pathMatch: 'full' },
     ],
   },
