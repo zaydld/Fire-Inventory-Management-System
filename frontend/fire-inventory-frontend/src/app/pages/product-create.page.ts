@@ -47,7 +47,7 @@ type CreateProductPayload = {
       </div>
 
       <form
-        class="rounded-2xl border bg-white p-6"
+        class="rounded-2xl border p-6 form-card"
         [formGroup]="form"
         (ngSubmit)="submit()"
       >
@@ -119,7 +119,6 @@ export class ProductCreatePageComponent {
     private router: Router,
     private snack: MatSnackBar
   ) {
-    // ✅ init form in constructor (évite l’erreur “used before initialization”)
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       description: [''],
@@ -162,8 +161,6 @@ export class ProductCreatePageComponent {
         next: (res) => {
           this.loading.set(false);
 
-          // ✅ Si backend renvoie une erreur GraphQL (Apollo la met souvent dans error(),
-          // mais au cas où, on sécurise)
           if (!res.data?.createProduct?.id) {
             this.snack.open('Create product failed', 'OK', { duration: 3000 });
             return;

@@ -47,7 +47,10 @@ type Product = { id: string; name: string; price: number; quantity: number };
   template: `
     <div class="max-w-5xl mx-auto">
       <div class="flex items-center justify-between mb-6">
-        <h1 class="text-3xl font-semibold">Products</h1>
+        <h1 class="text-3xl font-semibold text-gray-900 dark:text-white">
+          Products
+        </h1>
+
 
         <button mat-raised-button color="primary" routerLink="/products/new">
           <mat-icon class="mr-2">add</mat-icon>

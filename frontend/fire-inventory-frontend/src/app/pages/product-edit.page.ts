@@ -21,8 +21,6 @@ type Product = {
   quantity: number;
 };
 
-// ✅ 1) Query: pré-remplir avec productById
-// IMPORTANT: Strawberry chez toi ne supporte pas ID => String!
 const PRODUCT_BY_ID_QUERY = gql`
   query ProductById($id: String!) {
     productById(id: $id) {
@@ -35,8 +33,6 @@ const PRODUCT_BY_ID_QUERY = gql`
   }
 `;
 
-// ✅ 2) Mutation: update
-// IMPORTANT: idem => id: String!
 const UPDATE_PRODUCT_MUTATION = gql`
   mutation UpdateProduct($id: String!, $input: ProductUpdateInput!) {
     updateProduct(id: $id, input: $input) {
@@ -65,7 +61,7 @@ const UPDATE_PRODUCT_MUTATION = gql`
       </div>
 
       @if (loading()) {
-        <div class="rounded-2xl border bg-white p-6">
+        <div class="rounded-2xl border p-6 form-card">
           Loading...
         </div>
       } @else if (notFound()) {
@@ -74,7 +70,7 @@ const UPDATE_PRODUCT_MUTATION = gql`
         </div>
       } @else {
         <form
-          class="rounded-2xl border bg-white p-6"
+          class="rounded-2xl border p-6 form-card"
           [formGroup]="form"
           (ngSubmit)="submit()"
         >

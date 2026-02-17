@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { Apollo, gql } from 'apollo-angular';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-// ✅ Material imports (standalone)
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -34,13 +33,15 @@ const LOGIN_MUTATION = gql`
   template: `
     <div class="min-h-screen flex items-center justify-center p-6">
       <div class="w-full max-w-md">
+
         <div class="mb-6 text-center">
           <h1 class="text-2xl font-semibold">Sign in</h1>
           <p class="text-gray-600 mt-1">Fire Inventory Management</p>
         </div>
 
-        <div class="rounded-2xl border bg-white p-6 shadow-sm">
+        <div class="rounded-2xl border p-6 shadow-sm form-card">
           <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4">
+
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>Username</mat-label>
               <input matInput formControlName="username" autocomplete="username" />
@@ -71,8 +72,10 @@ const LOGIN_MUTATION = gql`
             >
               @if (loading()) { Signing in... } @else { Login }
             </button>
+
           </form>
         </div>
+
       </div>
     </div>
   `,
@@ -80,7 +83,6 @@ const LOGIN_MUTATION = gql`
 export class LoginPageComponent {
   loading = signal(false);
 
-  // ✅ inject fb to avoid "used before init"
   private fb = inject(FormBuilder);
 
   form = this.fb.group({
