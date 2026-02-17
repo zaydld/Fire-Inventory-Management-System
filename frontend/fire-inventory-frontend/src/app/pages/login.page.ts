@@ -8,6 +8,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+
 const LOGIN_MUTATION = gql`
   mutation Login($username: String!, $password: String!) {
     login(username: $username, password: $password) {
@@ -26,6 +28,7 @@ const LOGIN_MUTATION = gql`
   standalone: true,
   imports: [
     ReactiveFormsModule,
+    TranslateModule, // ✅ pipe translate
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
@@ -35,31 +38,35 @@ const LOGIN_MUTATION = gql`
       <div class="w-full max-w-md">
 
         <div class="mb-6 text-center">
-          <h1 class="text-2xl font-semibold">Sign in</h1>
-          <p class="text-gray-600 mt-1">Fire Inventory Management</p>
+          <h1 class="text-2xl font-semibold">
+            {{ 'LOGIN.TITLE' | translate }}
+          </h1>
+          <p class="text-gray-600 mt-1">
+            {{ 'APP.TITLE' | translate }}
+          </p>
         </div>
 
-        <div class="rounded-2xl border p-6 shadow-sm form-card">
+        <div class="rounded-2xl border p-6 shadow-sm form-card bg-white dark:bg-slate-900 dark:border-slate-700">
           <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4">
 
             <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Username</mat-label>
+              <mat-label>{{ 'LOGIN.USERNAME' | translate }}</mat-label>
               <input matInput formControlName="username" autocomplete="username" />
-              @if (form.controls.username.touched && form.controls.username.invalid) {
-                <mat-error>Username is required</mat-error>
+              @if (form.controls.username.touched && form.controls.username.hasError('required')) {
+                <mat-error>{{ 'LOGIN.USERNAME_REQUIRED' | translate }}</mat-error>
               }
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Password</mat-label>
+              <mat-label>{{ 'LOGIN.PASSWORD' | translate }}</mat-label>
               <input
                 matInput
                 type="password"
                 formControlName="password"
                 autocomplete="current-password"
               />
-              @if (form.controls.password.touched && form.controls.password.invalid) {
-                <mat-error>Password is required</mat-error>
+              @if (form.controls.password.touched && form.controls.password.hasError('required')) {
+                <mat-error>{{ 'LOGIN.PASSWORD_REQUIRED' | translate }}</mat-error>
               }
             </mat-form-field>
 
@@ -70,7 +77,11 @@ const LOGIN_MUTATION = gql`
               type="submit"
               [disabled]="form.invalid || loading()"
             >
-              @if (loading()) { Signing in... } @else { Login }
+              @if (loading()) {
+                {{ 'LOGIN.SIGNING_IN' | translate }}
+              } @else {
+                {{ 'LOGIN.SUBMIT' | translate }}
+              }
             </button>
 
           </form>
@@ -93,11 +104,21 @@ export class LoginPageComponent {
   constructor(
     private apollo: Apollo,
     private router: Router,
-    private snack: MatSnackBar
+    private snack: MatSnackBar,
+    private translate: TranslateService
   ) {}
 
+  private toast(key: string): void {
+    // ✅ snackbar traduit
+    const msg = this.translate.instant(key);
+    this.snack.open(msg, 'OK', { duration: 3000 });
+  }
+
   submit(): void {
-    if (this.form.invalid || this.loading()) return;
+    if (this.form.invalid || this.loading()) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
     const username = this.form.value.username?.trim() ?? '';
     const password = this.form.value.password ?? '';
@@ -118,7 +139,7 @@ export class LoginPageComponent {
           const token: string | undefined = payload?.token;
 
           if (!token) {
-            this.snack.open('Invalid credentials', 'OK', { duration: 3000 });
+            this.toast('LOGIN.INVALID_CREDENTIALS');
             return;
           }
 
@@ -128,14 +149,14 @@ export class LoginPageComponent {
         error: (err) => {
           this.loading.set(false);
 
-          const msg = String(err?.message ?? '');
+          const msg = String((err as any)?.message ?? '');
 
           if (msg.includes('Invalid credentials')) {
-            this.snack.open('Invalid credentials', 'OK', { duration: 3000 });
+            this.toast('LOGIN.INVALID_CREDENTIALS');
             return;
           }
 
-          this.snack.open('Server unreachable', 'OK', { duration: 3000 });
+          this.toast('COMMON.SERVER_UNREACHABLE');
         },
       });
   }

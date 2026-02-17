@@ -1,0 +1,75 @@
+{
+  "APP": {
+    "TITLE": "FIRE Inventaire"
+  },
+
+  "MENU": {
+    "PRODUCTS": "Produits",
+    "LOGOUT": "Déconnexion"
+  },
+
+  "COMMON": {
+    "BACK": "Retour",
+    "CREATE": "Créer",
+    "CREATING": "Création...",
+    "LOADING": "Chargement...",
+    "SAVE": "Enregistrer",
+    "SAVING": "Enregistrement...",
+    "NEW": "Nouveau",
+    "CANCEL": "Annuler",
+    "DELETE": "Supprimer"
+  },
+
+  "PRODUCT": {
+    "CREATE": {
+      "TITLE": "Nouveau produit"
+    },
+    "EDIT": {
+      "TITLE": "Modifier le produit"
+    },
+    "NOT_FOUND": "Produit introuvable",
+    "FIELDS": {
+      "NAME": "Nom",
+      "DESCRIPTION": "Description",
+      "PRICE": "Prix",
+      "QUANTITY": "Quantité"
+    }
+  },
+
+  "PRODUCTS": {
+    "COLUMNS": {
+      "NAME": "Nom",
+      "PRICE": "Prix",
+      "QUANTITY": "Quantité",
+      "ACTIONS": "Actions"
+    }
+  },
+
+  "VALIDATION": {
+    "REQUIRED": "Champ obligatoire",
+    "MIN_2": "Minimum 2 caractères",
+    "MIN_0": "Doit être ≥ 0"
+  },
+
+  "SNACK": {
+    "CREATED_SUCCESS": "Produit créé avec succès",
+    "CREATE_FAILED": "Échec de création du produit",
+    "LOAD_FAILED": "Échec du chargement du produit",
+    "UPDATED_SUCCESS": "Produit mis à jour avec succès",
+    "UPDATE_FAILED": "Échec de la mise à jour"
+  },
+  "LOGIN": {
+  "TITLE": "Connexion",
+  "USERNAME": "Nom d'utilisateur",
+  "PASSWORD": "Mot de passe",
+  "USERNAME_REQUIRED": "Nom d'utilisateur obligatoire",
+  "PASSWORD_REQUIRED": "Mot de passe obligatoire",
+  "SUBMIT": "Se connecter",
+  "SUBMITTING": "Connexion..."
+},
+  "DIALOG": {
+  "DELETE_TITLE": "Confirmation",
+  "DELETE_CONFIRM": "Êtes-vous sûr de vouloir supprimer {{name}} ?"
+}
+
+}

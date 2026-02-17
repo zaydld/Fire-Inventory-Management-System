@@ -7,17 +7,20 @@ import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
+import { TranslateModule } from '@ngx-translate/core';
+
 import { removeToken } from '../core/auth-token';
 import { ThemeService } from '../core/theme.service';
+import { I18nService } from '../core/i18n.service';
 
 @Component({
   selector: 'app-main-layout',
   standalone: true,
   styles: [`
+    /* Force couleur texte des items (Material list) */
     ::ng-deep .mat-mdc-list-item .mdc-list-item__primary-text {
       color: #111827 !important;
     }
-
     ::ng-deep html.dark .mat-mdc-list-item .mdc-list-item__primary-text {
       color: #ffffff !important;
     }
@@ -30,6 +33,7 @@ import { ThemeService } from '../core/theme.service';
     MatListModule,
     MatButtonModule,
     MatIconModule,
+    TranslateModule,
   ],
   template: `
     <mat-sidenav-container class="h-screen" autosize>
@@ -42,44 +46,55 @@ import { ThemeService } from '../core/theme.service';
         class="w-60"
       >
         <div class="p-4 font-semibold text-lg">
-          Fire Inventory
+          {{ 'APP.TITLE' | translate }}
         </div>
 
         <mat-nav-list>
-        <a
+          <a
             routerLink="/products"
             (click)="closeIfMobile()"
             class="flex items-center gap-3 px-4 py-3 rounded-lg mx-2
-                text-gray-900 dark:text-white
-                hover:bg-gray-100 dark:hover:bg-slate-700
-                transition-colors"
-        >
+                   text-gray-900 dark:text-white
+                   hover:bg-gray-100 dark:hover:bg-slate-700
+                   transition-colors"
+          >
             <mat-icon class="text-gray-900 dark:text-white">inventory_2</mat-icon>
-            <span class="text-gray-900 dark:text-white font-medium">Products</span>
-        </a>
-    </mat-nav-list>
+            <span class="text-gray-900 dark:text-white font-medium">
+              {{ 'MENU.PRODUCTS' | translate }}
+            </span>
+          </a>
+        </mat-nav-list>
 
         <div class="p-4 mt-6">
           <button mat-stroked-button class="w-full" (click)="logout()">
             <mat-icon class="mr-2">logout</mat-icon>
-            Logout
+            {{ 'MENU.LOGOUT' | translate }}
           </button>
         </div>
       </mat-sidenav>
 
       <!-- CONTENT -->
       <mat-sidenav-content>
-
         <mat-toolbar color="primary">
           <button mat-icon-button (click)="toggleDrawer()">
             <mat-icon>menu</mat-icon>
           </button>
 
-          <span class="ml-2">Fire Inventory</span>
+          <span class="ml-2">{{ 'APP.TITLE' | translate }}</span>
 
           <span class="flex-1"></span>
 
-          <!-- Theme toggle -->
+          <!-- ✅ Language switch -->
+          <button
+            mat-button
+            (click)="toggleLang()"
+            class="text-white font-semibold"
+            aria-label="Toggle language"
+          >
+            {{ lang.toUpperCase() }}
+          </button>
+
+          <!-- ✅ Theme toggle -->
           <button
             mat-icon-button
             (click)="toggleTheme()"
@@ -104,24 +119,29 @@ export class MainLayoutComponent implements OnInit {
   isMobile = window.innerWidth < 768;
   isDark = false;
 
+  // ✅ langue affichée dans le bouton (EN/FR)
+  lang: 'en' | 'fr' = 'en';
+
   constructor(
     private router: Router,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {
-    // applique le thème sauvegardé
+    // ✅ Theme
     this.themeService.initTheme();
-
-    // sync icône
     this.isDark = this.themeService.get() === 'dark';
+
+    // ✅ Lang (init + sync)
+    this.i18n.init();
+    this.lang = this.i18n.get();
   }
 
   @HostListener('window:resize')
   onResize() {
     this.isMobile = window.innerWidth < 768;
 
-    // si on passe desktop, garder le menu ouvert
     if (!this.isMobile && this.drawer) {
       this.drawer.open();
     }
@@ -138,6 +158,11 @@ export class MainLayoutComponent implements OnInit {
   toggleTheme(): void {
     this.themeService.toggle();
     this.isDark = this.themeService.get() === 'dark';
+  }
+
+  toggleLang(): void {
+    this.i18n.toggle();
+    this.lang = this.i18n.get();
   }
 
   logout(): void {

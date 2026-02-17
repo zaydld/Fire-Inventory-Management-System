@@ -13,6 +13,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+
 import { removeToken } from '../core/auth-token';
 
 const CREATE_PRODUCT_MUTATION = gql`
@@ -34,6 +36,9 @@ type CreateProductPayload = {
   imports: [
     ReactiveFormsModule,
     RouterLink,
+
+    TranslateModule, // ✅ translate pipe
+
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
@@ -42,55 +47,63 @@ type CreateProductPayload = {
   template: `
     <div class="max-w-2xl mx-auto">
       <div class="flex items-center justify-between mb-6">
-        <h1 class="text-3xl font-semibold">New Product</h1>
-        <a mat-stroked-button routerLink="/products">Back</a>
+        <h1 class="text-3xl font-semibold text-gray-900 dark:text-white">
+          {{ 'PRODUCT.CREATE.TITLE' | translate }}
+        </h1>
+
+        <a mat-stroked-button routerLink="/products">
+          {{ 'COMMON.BACK' | translate }}
+        </a>
       </div>
 
       <form
-        class="rounded-2xl border p-6 form-card"
+        class="rounded-2xl border p-6 form-card bg-white dark:bg-slate-900 dark:border-slate-700"
         [formGroup]="form"
         (ngSubmit)="submit()"
       >
         <!-- name -->
         <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Name</mat-label>
+          <mat-label>{{ 'PRODUCT.FIELDS.NAME' | translate }}</mat-label>
           <input matInput formControlName="name" />
+
           @if (form.controls['name'].touched && form.controls['name'].hasError('required')) {
-            <mat-error>Name is required</mat-error>
+            <mat-error>{{ 'VALIDATION.REQUIRED' | translate }}</mat-error>
           }
           @if (form.controls['name'].touched && form.controls['name'].hasError('minlength')) {
-            <mat-error>Name must be at least 2 characters</mat-error>
+            <mat-error>{{ 'VALIDATION.MIN_2' | translate }}</mat-error>
           }
         </mat-form-field>
 
         <!-- description -->
         <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Description</mat-label>
+          <mat-label>{{ 'PRODUCT.FIELDS.DESCRIPTION' | translate }}</mat-label>
           <textarea matInput rows="3" formControlName="description"></textarea>
         </mat-form-field>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- price -->
           <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Price</mat-label>
+            <mat-label>{{ 'PRODUCT.FIELDS.PRICE' | translate }}</mat-label>
             <input matInput type="number" formControlName="price" placeholder="0" />
+
             @if (form.controls['price'].touched && form.controls['price'].hasError('required')) {
-              <mat-error>Price is required</mat-error>
+              <mat-error>{{ 'VALIDATION.REQUIRED' | translate }}</mat-error>
             }
             @if (form.controls['price'].touched && form.controls['price'].hasError('min')) {
-              <mat-error>Price must be ≥ 0</mat-error>
+              <mat-error>{{ 'VALIDATION.MIN_0' | translate }}</mat-error>
             }
           </mat-form-field>
 
           <!-- quantity -->
           <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Quantity</mat-label>
+            <mat-label>{{ 'PRODUCT.FIELDS.QUANTITY' | translate }}</mat-label>
             <input matInput type="number" formControlName="quantity" placeholder="0" />
+
             @if (form.controls['quantity'].touched && form.controls['quantity'].hasError('required')) {
-              <mat-error>Quantity is required</mat-error>
+              <mat-error>{{ 'VALIDATION.REQUIRED' | translate }}</mat-error>
             }
             @if (form.controls['quantity'].touched && form.controls['quantity'].hasError('min')) {
-              <mat-error>Quantity must be ≥ 0</mat-error>
+              <mat-error>{{ 'VALIDATION.MIN_0' | translate }}</mat-error>
             }
           </mat-form-field>
         </div>
@@ -102,7 +115,11 @@ type CreateProductPayload = {
             type="submit"
             [disabled]="form.invalid || loading()"
           >
-            @if (loading()) { Creating... } @else { Create }
+            @if (loading()) {
+              {{ 'COMMON.CREATING' | translate }}
+            } @else {
+              {{ 'COMMON.CREATE' | translate }}
+            }
           </button>
         </div>
       </form>
@@ -117,7 +134,8 @@ export class ProductCreatePageComponent {
     private fb: FormBuilder,
     private apollo: Apollo,
     private router: Router,
-    private snack: MatSnackBar
+    private snack: MatSnackBar,
+    private translate: TranslateService
   ) {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
@@ -125,6 +143,10 @@ export class ProductCreatePageComponent {
       price: [null, [Validators.required, Validators.min(0)]],
       quantity: [null, [Validators.required, Validators.min(0)]],
     });
+  }
+
+  private toast(key: string): void {
+    this.snack.open(this.translate.instant(key), 'OK', { duration: 3000 });
   }
 
   submit(): void {
@@ -162,31 +184,25 @@ export class ProductCreatePageComponent {
           this.loading.set(false);
 
           if (!res.data?.createProduct?.id) {
-            this.snack.open('Create product failed', 'OK', { duration: 3000 });
+            this.toast('SNACK.CREATE_FAILED');
             return;
           }
 
-          this.snack.open('Product created successfully', 'OK', {
-            duration: 2500,
-          });
+          this.toast('SNACK.CREATED_SUCCESS');
           this.router.navigate(['/products']);
         },
         error: (err) => {
           this.loading.set(false);
-          console.error('CREATE PRODUCT ERROR:', err);
 
-          const msg =
-            (err as any)?.message ||
-            (err as any)?.graphQLErrors?.[0]?.message ||
-            '';
+          const msg = String((err as any)?.message ?? '');
 
-          if (msg === 'Unauthorized') {
+          if (msg.includes('Unauthorized')) {
             removeToken();
             this.router.navigate(['/login']);
             return;
           }
 
-          this.snack.open('Create product failed', 'OK', { duration: 3000 });
+          this.toast('SNACK.CREATE_FAILED');
         },
       });
   }

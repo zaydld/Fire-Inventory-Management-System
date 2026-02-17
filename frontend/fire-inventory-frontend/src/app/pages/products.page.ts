@@ -8,9 +8,10 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
-// ✅ Dialog
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ConfirmDeleteDialogComponent } from '../components/confirm-delete-dialog.component';
+
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 const PRODUCTS_QUERY = gql`
   query Products {
@@ -23,7 +24,6 @@ const PRODUCTS_QUERY = gql`
   }
 `;
 
-// ✅ Delete mutation (String! car ton backend ne supporte pas ID)
 const DELETE_PRODUCT_MUTATION = gql`
   mutation DeleteProduct($id: String!) {
     deleteProduct(id: $id)
@@ -42,52 +42,76 @@ type Product = { id: string; name: string; price: number; quantity: number };
     MatButtonModule,
     MatIconModule,
     MatSnackBarModule,
-    MatDialogModule, // ✅
+    MatDialogModule,
+    TranslateModule,
   ],
   template: `
     <div class="max-w-5xl mx-auto">
-      <div class="flex items-center justify-between mb-6">
-        <h1 class="text-3xl font-semibold text-gray-900 dark:text-white">
-          Products
-        </h1>
 
+      <!-- HEADER -->
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="text-3xl font-semibold">
+          {{ 'MENU.PRODUCTS' | translate }}
+        </h1>
 
         <button mat-raised-button color="primary" routerLink="/products/new">
           <mat-icon class="mr-2">add</mat-icon>
-          New
+          {{ 'COMMON.NEW' | translate }}
         </button>
       </div>
 
+      <!-- LOADING -->
       @if (loading()) {
         <div class="flex justify-center py-16">
           <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
         </div>
-      } @else {
-        <div class="rounded-2xl border overflow-hidden bg-white">
+      }
+
+      <!-- EMPTY STATE -->
+      @else if (products().length === 0) {
+        <div class="rounded-2xl border p-6 form-card">
+          <p>{{ 'COMMON.LOADING' | translate }}</p>
+        </div>
+      }
+
+      <!-- TABLE -->
+      @else {
+        <div class="rounded-2xl border overflow-hidden table-card">
           <table mat-table [dataSource]="products()" class="w-full">
 
+            <!-- NAME -->
             <ng-container matColumnDef="name">
-              <th mat-header-cell *matHeaderCellDef>Name</th>
+              <th mat-header-cell *matHeaderCellDef>
+                {{ 'PRODUCTS.COLUMNS.NAME' | translate }}
+              </th>
               <td mat-cell *matCellDef="let p">{{ p.name }}</td>
             </ng-container>
 
+            <!-- PRICE -->
             <ng-container matColumnDef="price">
-              <th mat-header-cell *matHeaderCellDef>Price</th>
+              <th mat-header-cell *matHeaderCellDef>
+                {{ 'PRODUCTS.COLUMNS.PRICE' | translate }}
+              </th>
               <td mat-cell *matCellDef="let p">{{ p.price }}</td>
             </ng-container>
 
+            <!-- QUANTITY -->
             <ng-container matColumnDef="quantity">
-              <th mat-header-cell *matHeaderCellDef>Quantity</th>
+              <th mat-header-cell *matHeaderCellDef>
+                {{ 'PRODUCTS.COLUMNS.QUANTITY' | translate }}
+              </th>
               <td mat-cell *matCellDef="let p">{{ p.quantity }}</td>
             </ng-container>
 
+            <!-- ACTIONS -->
             <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <th mat-header-cell *matHeaderCellDef>
+                {{ 'PRODUCTS.COLUMNS.ACTIONS' | translate }}
+              </th>
               <td mat-cell *matCellDef="let p" class="space-x-2">
                 <button mat-icon-button [routerLink]="['/products', p.id, 'edit']">
                   <mat-icon>edit</mat-icon>
                 </button>
-
                 <button mat-icon-button (click)="confirmDelete(p)">
                   <mat-icon>delete</mat-icon>
                 </button>
@@ -95,7 +119,10 @@ type Product = { id: string; name: string; price: number; quantity: number };
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr
+              mat-row
+              *matRowDef="let row; columns: displayedColumns; trackBy: trackById"
+            ></tr>
           </table>
         </div>
       }
@@ -114,11 +141,11 @@ export class ProductsPageComponent implements OnInit {
     private apollo: Apollo,
     private router: Router,
     private snack: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
-    // garder une référence pour refetch() après delete
     this.productsQuery = this.apollo.watchQuery<{ products: Product[] }>({
       query: PRODUCTS_QUERY,
       fetchPolicy: 'network-only',
@@ -127,7 +154,6 @@ export class ProductsPageComponent implements OnInit {
     this.productsQuery.valueChanges.subscribe({
       next: (res) => {
         this.loading.set(res.loading);
-
         const list = (res.data?.products ?? []).filter(
           (p): p is Product => !!p?.id
         );
@@ -146,10 +172,14 @@ export class ProductsPageComponent implements OnInit {
           return;
         }
 
-        this.snack.open('Failed to load products', 'OK', { duration: 3000 });
+        this.translate.get('SNACK.LOAD_FAILED').subscribe((t) => {
+          this.snack.open(t, 'OK', { duration: 3000 });
+        });
       },
     });
   }
+
+  trackById = (_: number, p: Product) => p.id;
 
   confirmDelete(p: Product): void {
     const ref = this.dialog.open(ConfirmDeleteDialogComponent, {
@@ -168,8 +198,10 @@ export class ProductsPageComponent implements OnInit {
         })
         .subscribe({
           next: async () => {
-            this.snack.open('Product deleted', 'OK', { duration: 2500 });
-            await this.productsQuery.refetch(); // ✅ refresh table
+            this.translate.get('SNACK.DELETED_SUCCESS').subscribe((t) => {
+              this.snack.open(t, 'OK', { duration: 2500 });
+            });
+            await this.productsQuery.refetch();
           },
           error: (err: unknown) => {
             const msg =
@@ -183,13 +215,15 @@ export class ProductsPageComponent implements OnInit {
             }
 
             if (msg.includes('Forbidden')) {
-              this.snack.open('You are not allowed to delete products', 'OK', {
-                duration: 3000,
+              this.translate.get('SNACK.DELETE_FORBIDDEN').subscribe((t) => {
+                this.snack.open(t, 'OK', { duration: 3000 });
               });
               return;
             }
 
-            this.snack.open('Delete failed', 'OK', { duration: 3000 });
+            this.translate.get('SNACK.DELETE_FAILED').subscribe((t) => {
+              this.snack.open(t, 'OK', { duration: 3000 });
+            });
           },
         });
     });

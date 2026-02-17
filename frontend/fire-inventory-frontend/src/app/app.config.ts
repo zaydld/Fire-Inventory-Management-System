@@ -23,34 +23,45 @@ import { provideApollo } from 'apollo-angular';
 // Token helper
 import { getToken } from './core/auth-token';
 
+// ✅ ngx-translate v17 (standalone providers)
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
+
+    // ✅ requis pour loader http + le reste (Apollo etc.)
     provideHttpClient(),
 
     importProvidersFrom(MatToolbarModule, MatButtonModule),
 
+    // ✅ ngx-translate (default EN + fichiers JSON)
+    provideTranslateService({
+      lang: 'en',
+      fallbackLang: 'en',
+      loader: provideTranslateHttpLoader({
+        prefix: '/assets/i18n/',
+        suffix: '.json',
+      }),
+    }),
+
+    // ✅ Apollo
     provideApollo(() => {
       const httpLink = createHttpLink({
         uri: environment.graphqlUri, // '/graphql' via proxy
         fetch,
       });
 
-      // ✅ Typage safe: on prend err en any (évite ErrorHandlerOptions)
       const errorLink = onError((err: any) => {
-        const networkError = err?.networkError;
-        const graphQLErrors = err?.graphQLErrors;
-
-        if (networkError) console.error('Network error', networkError);
-        if (graphQLErrors?.length) console.error('GraphQL errors', graphQLErrors);
+        if (err?.networkError) console.error('Network error', err.networkError);
+        if (err?.graphQLErrors?.length) console.error('GraphQL errors', err.graphQLErrors);
       });
 
-      // ✅ TS strict: ctx['headers'] au lieu de ctx.headers
       const authLink = setContext((_, ctx: any) => {
         const token = getToken();
         const prevHeaders = (ctx?.['headers'] ?? {}) as Record<string, string>;
-
         return {
           headers: {
             ...prevHeaders,

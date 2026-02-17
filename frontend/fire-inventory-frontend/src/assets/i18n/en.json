@@ -1,0 +1,76 @@
+{
+  "APP": {
+    "TITLE": "FIRE Inventory"
+  },
+
+  "MENU": {
+    "PRODUCTS": "Products",
+    "LOGOUT": "Logout"
+  },
+
+  "COMMON": {
+    "BACK": "Back",
+    "CREATE": "Create",
+    "CREATING": "Creating...",
+    "LOADING": "Loading...",
+    "SAVE": "Save",
+    "SAVING": "Saving...",
+    "NEW": "New",
+    "CANCEL": "Cancel",
+    "DELETE": "Delete"
+  },
+ 
+
+  "PRODUCT": {
+    "CREATE": {
+      "TITLE": "New Product"
+    },
+    "EDIT": {
+      "TITLE": "Edit Product"
+    },
+    "NOT_FOUND": "Product not found",
+    "FIELDS": {
+      "NAME": "Name",
+      "DESCRIPTION": "Description",
+      "PRICE": "Price",
+      "QUANTITY": "Quantity"
+    }
+  },
+
+  "PRODUCTS": {
+    "COLUMNS": {
+      "NAME": "Name",
+      "PRICE": "Price",
+      "QUANTITY": "Quantity",
+      "ACTIONS": "Actions"
+    }
+  },
+
+  "VALIDATION": {
+    "REQUIRED": "This field is required",
+    "MIN_2": "Minimum 2 characters",
+    "MIN_0": "Must be ≥ 0"
+  },
+
+  "SNACK": {
+    "CREATED_SUCCESS": "Product created successfully",
+    "CREATE_FAILED": "Create product failed",
+    "LOAD_FAILED": "Failed to load product",
+    "UPDATED_SUCCESS": "Product updated successfully",
+    "UPDATE_FAILED": "Update failed"
+  },
+  "LOGIN": {
+  "TITLE": "Sign in",
+  "USERNAME": "Username",
+  "PASSWORD": "Password",
+  "USERNAME_REQUIRED": "Username is required",
+  "PASSWORD_REQUIRED": "Password is required",
+  "SUBMIT": "Login",
+  "SUBMITTING": "Signing in..."
+},
+"DIALOG": {
+  "DELETE_TITLE": "Confirmation",
+  "DELETE_CONFIRM": "Are you sure you want to delete {{name}}?"
+}
+
+}
