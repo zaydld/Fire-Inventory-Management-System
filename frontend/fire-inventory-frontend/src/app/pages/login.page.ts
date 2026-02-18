@@ -7,6 +7,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
@@ -28,15 +29,15 @@ const LOGIN_MUTATION = gql`
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    TranslateModule, // ✅ pipe translate
+    TranslateModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    MatProgressSpinnerModule, // ✅ spinner
   ],
   template: `
     <div class="min-h-screen flex items-center justify-center p-6">
       <div class="w-full max-w-md">
-
         <div class="mb-6 text-center">
           <h1 class="text-2xl font-semibold">
             {{ 'LOGIN.TITLE' | translate }}
@@ -46,9 +47,10 @@ const LOGIN_MUTATION = gql`
           </p>
         </div>
 
-        <div class="rounded-2xl border p-6 shadow-sm form-card bg-white dark:bg-slate-900 dark:border-slate-700">
+        <div
+          class="rounded-2xl border p-6 shadow-sm form-card bg-white dark:bg-slate-900 dark:border-slate-700"
+        >
           <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4">
-
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>{{ 'LOGIN.USERNAME' | translate }}</mat-label>
               <input matInput formControlName="username" autocomplete="username" />
@@ -73,20 +75,22 @@ const LOGIN_MUTATION = gql`
             <button
               mat-raised-button
               color="primary"
-              class="w-full"
+              class="w-full flex items-center justify-center gap-2"
               type="submit"
               [disabled]="form.invalid || loading()"
             >
               @if (loading()) {
-                {{ 'LOGIN.SIGNING_IN' | translate }}
+                <mat-progress-spinner
+                  diameter="18"
+                  mode="indeterminate"
+                ></mat-progress-spinner>
+                <span>{{ 'LOGIN.SUBMITTING' | translate }}</span>
               } @else {
-                {{ 'LOGIN.SUBMIT' | translate }}
+                <span>{{ 'LOGIN.SUBMIT' | translate }}</span>
               }
             </button>
-
           </form>
         </div>
-
       </div>
     </div>
   `,
@@ -109,13 +113,14 @@ export class LoginPageComponent {
   ) {}
 
   private toast(key: string): void {
-    // ✅ snackbar traduit
     const msg = this.translate.instant(key);
     this.snack.open(msg, 'OK', { duration: 3000 });
   }
 
   submit(): void {
-    if (this.form.invalid || this.loading()) {
+    if (this.loading()) return;
+
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
@@ -139,6 +144,7 @@ export class LoginPageComponent {
           const token: string | undefined = payload?.token;
 
           if (!token) {
+            // si tu n’as pas cette key, ajoute-la dans en/fr.json
             this.toast('LOGIN.INVALID_CREDENTIALS');
             return;
           }
@@ -156,7 +162,8 @@ export class LoginPageComponent {
             return;
           }
 
-          this.toast('COMMON.SERVER_UNREACHABLE');
+          // ✅ clé correcte selon ton JSON
+          this.toast('ERRORS.SERVER_UNREACHABLE');
         },
       });
   }

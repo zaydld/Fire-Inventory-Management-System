@@ -71,14 +71,7 @@ export class ProductsService {
   constructor(private apollo: Apollo) {}
 
   // ✅ 1) products query
-  getProducts(): Observable<{ products: Product[] }> {
-    return this.apollo
-      .query<{ products: Product[] }>({
-        query: PRODUCTS_QUERY,
-        fetchPolicy: 'network-only',
-      })
-      .pipe(map((res) => res.data));
-  }
+  
 
   // ✅ 2) create mutation
   createProduct(input: ProductInput): Observable<{ createProduct: Product }> {

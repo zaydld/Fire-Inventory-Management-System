@@ -47,7 +47,6 @@ type Product = { id: string; name: string; price: number; quantity: number };
   ],
   template: `
     <div class="max-w-5xl mx-auto">
-
       <!-- HEADER -->
       <div class="flex items-center justify-between mb-6">
         <h1 class="text-3xl font-semibold">
@@ -60,7 +59,7 @@ type Product = { id: string; name: string; price: number; quantity: number };
         </button>
       </div>
 
-      <!-- LOADING -->
+      <!-- LOADING LIST -->
       @if (loading()) {
         <div class="flex justify-center py-16">
           <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
@@ -70,7 +69,10 @@ type Product = { id: string; name: string; price: number; quantity: number };
       <!-- EMPTY STATE -->
       @else if (products().length === 0) {
         <div class="rounded-2xl border p-6 form-card">
-          <p>{{ 'COMMON.LOADING' | translate }}</p>
+          <p class="text-gray-600">
+            <!-- si tu veux, crée une clé COMMON.NO_DATA -->
+            No products yet.
+          </p>
         </div>
       }
 
@@ -79,7 +81,6 @@ type Product = { id: string; name: string; price: number; quantity: number };
         <div class="rounded-2xl border overflow-hidden table-card">
           <table mat-table [dataSource]="products()" class="w-full">
 
-            <!-- NAME -->
             <ng-container matColumnDef="name">
               <th mat-header-cell *matHeaderCellDef>
                 {{ 'PRODUCTS.COLUMNS.NAME' | translate }}
@@ -87,7 +88,6 @@ type Product = { id: string; name: string; price: number; quantity: number };
               <td mat-cell *matCellDef="let p">{{ p.name }}</td>
             </ng-container>
 
-            <!-- PRICE -->
             <ng-container matColumnDef="price">
               <th mat-header-cell *matHeaderCellDef>
                 {{ 'PRODUCTS.COLUMNS.PRICE' | translate }}
@@ -95,7 +95,6 @@ type Product = { id: string; name: string; price: number; quantity: number };
               <td mat-cell *matCellDef="let p">{{ p.price }}</td>
             </ng-container>
 
-            <!-- QUANTITY -->
             <ng-container matColumnDef="quantity">
               <th mat-header-cell *matHeaderCellDef>
                 {{ 'PRODUCTS.COLUMNS.QUANTITY' | translate }}
@@ -103,17 +102,33 @@ type Product = { id: string; name: string; price: number; quantity: number };
               <td mat-cell *matCellDef="let p">{{ p.quantity }}</td>
             </ng-container>
 
-            <!-- ACTIONS -->
             <ng-container matColumnDef="actions">
               <th mat-header-cell *matHeaderCellDef>
                 {{ 'PRODUCTS.COLUMNS.ACTIONS' | translate }}
               </th>
+
               <td mat-cell *matCellDef="let p" class="space-x-2">
-                <button mat-icon-button [routerLink]="['/products', p.id, 'edit']">
+                <button
+                  mat-icon-button
+                  [routerLink]="['/products', p.id, 'edit']"
+                  [disabled]="deletingId() === p.id"
+                >
                   <mat-icon>edit</mat-icon>
                 </button>
-                <button mat-icon-button (click)="confirmDelete(p)">
-                  <mat-icon>delete</mat-icon>
+
+                <button
+                  mat-icon-button
+                  (click)="confirmDelete(p)"
+                  [disabled]="deletingId() === p.id"
+                >
+                  @if (deletingId() === p.id) {
+                    <mat-progress-spinner
+                      diameter="18"
+                      mode="indeterminate"
+                    ></mat-progress-spinner>
+                  } @else {
+                    <mat-icon>delete</mat-icon>
+                  }
                 </button>
               </td>
             </ng-container>
@@ -135,6 +150,9 @@ export class ProductsPageComponent implements OnInit {
   loading = signal(true);
   products = signal<Product[]>([]);
 
+  // ✅ spinner delete par ligne
+  deletingId = signal<string | null>(null);
+
   private productsQuery!: QueryRef<{ products: Product[] }>;
 
   constructor(
@@ -154,24 +172,11 @@ export class ProductsPageComponent implements OnInit {
     this.productsQuery.valueChanges.subscribe({
       next: (res) => {
         this.loading.set(res.loading);
-        const list = (res.data?.products ?? []).filter(
-          (p): p is Product => !!p?.id
-        );
+        const list = (res.data?.products ?? []).filter((p): p is Product => !!p?.id);
         this.products.set(list);
       },
-      error: (err: unknown) => {
+      error: () => {
         this.loading.set(false);
-
-        const msg =
-          typeof err === 'object' && err && 'message' in err
-            ? String((err as { message?: unknown }).message)
-            : '';
-
-        if (msg.includes('Unauthorized')) {
-          this.router.navigate(['/login']);
-          return;
-        }
-
         this.translate.get('SNACK.LOAD_FAILED').subscribe((t) => {
           this.snack.open(t, 'OK', { duration: 3000 });
         });
@@ -182,6 +187,8 @@ export class ProductsPageComponent implements OnInit {
   trackById = (_: number, p: Product) => p.id;
 
   confirmDelete(p: Product): void {
+    if (this.deletingId()) return;
+
     const ref = this.dialog.open(ConfirmDeleteDialogComponent, {
       width: '420px',
       data: { productName: p.name },
@@ -189,6 +196,8 @@ export class ProductsPageComponent implements OnInit {
 
     ref.afterClosed().subscribe((confirmed: boolean) => {
       if (!confirmed) return;
+
+      this.deletingId.set(p.id);
 
       this.apollo
         .mutate<{ deleteProduct: boolean }>({
@@ -198,12 +207,18 @@ export class ProductsPageComponent implements OnInit {
         })
         .subscribe({
           next: async () => {
+            this.deletingId.set(null);
+
+            // ⚠️ Assure-toi d’avoir ces keys dans tes JSON
             this.translate.get('SNACK.DELETED_SUCCESS').subscribe((t) => {
               this.snack.open(t, 'OK', { duration: 2500 });
             });
+
             await this.productsQuery.refetch();
           },
           error: (err: unknown) => {
+            this.deletingId.set(null);
+
             const msg =
               typeof err === 'object' && err && 'message' in err
                 ? String((err as { message?: unknown }).message)

@@ -19,7 +19,7 @@ import { TranslateModule } from '@ngx-translate/core';
 
     <!-- ✅ Message avec variable dynamique -->
     <div mat-dialog-content class="py-2">
-      {{ 'DIALOG.DELETE_CONFIRM' | translate:{ name: data?.productName } }}
+      {{ 'DIALOG.DELETE_CONFIRM' | translate:{ name: data.productName } }}
     </div>
 
     <!-- ✅ Boutons traduits -->

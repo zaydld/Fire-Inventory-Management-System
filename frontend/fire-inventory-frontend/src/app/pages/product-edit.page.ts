@@ -12,6 +12,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; // ✅ NEW
 
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
@@ -54,7 +55,8 @@ const UPDATE_PRODUCT_MUTATION = gql`
     MatInputModule,
     MatButtonModule,
     MatSnackBarModule,
-    TranslateModule, // ✅ important pour pipe translate
+    MatProgressSpinnerModule, // ✅ NEW
+    TranslateModule,
   ],
   template: `
     <div class="max-w-2xl mx-auto">
@@ -69,8 +71,8 @@ const UPDATE_PRODUCT_MUTATION = gql`
       </div>
 
       @if (loading()) {
-        <div class="rounded-2xl border p-6 form-card">
-          {{ 'COMMON.LOADING' | translate }}
+        <div class="flex justify-center py-16">
+          <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
         </div>
       } @else if (notFound()) {
         <div class="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
@@ -82,7 +84,6 @@ const UPDATE_PRODUCT_MUTATION = gql`
           [formGroup]="form"
           (ngSubmit)="submit()"
         >
-          <!-- name -->
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>{{ 'PRODUCT.FIELDS.NAME' | translate }}</mat-label>
             <input matInput formControlName="name" />
@@ -95,14 +96,12 @@ const UPDATE_PRODUCT_MUTATION = gql`
             }
           </mat-form-field>
 
-          <!-- description -->
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>{{ 'PRODUCT.FIELDS.DESCRIPTION' | translate }}</mat-label>
             <textarea matInput rows="3" formControlName="description"></textarea>
           </mat-form-field>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- price -->
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>{{ 'PRODUCT.FIELDS.PRICE' | translate }}</mat-label>
               <input matInput type="number" formControlName="price" />
@@ -115,7 +114,6 @@ const UPDATE_PRODUCT_MUTATION = gql`
               }
             </mat-form-field>
 
-            <!-- quantity -->
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>{{ 'PRODUCT.FIELDS.QUANTITY' | translate }}</mat-label>
               <input matInput type="number" formControlName="quantity" />
@@ -135,8 +133,19 @@ const UPDATE_PRODUCT_MUTATION = gql`
               color="primary"
               type="submit"
               [disabled]="form.invalid || saving()"
+              class="min-w-[140px]"
             >
-              @if (saving()) { {{ 'COMMON.SAVING' | translate }} } @else { {{ 'COMMON.SAVE' | translate }} }
+              @if (saving()) {
+                <span class="inline-flex items-center gap-2">
+                  <mat-progress-spinner
+                    diameter="18"
+                    mode="indeterminate"
+                  ></mat-progress-spinner>
+                  {{ 'COMMON.SAVING' | translate }}
+                </span>
+              } @else {
+                {{ 'COMMON.SAVE' | translate }}
+              }
             </button>
           </div>
         </form>

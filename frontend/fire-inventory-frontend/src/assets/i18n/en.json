@@ -57,20 +57,31 @@
     "CREATE_FAILED": "Create product failed",
     "LOAD_FAILED": "Failed to load product",
     "UPDATED_SUCCESS": "Product updated successfully",
-    "UPDATE_FAILED": "Update failed"
+    "UPDATE_FAILED": "Update failed",
+    "DELETE_FORBIDDEN": "Access denied",
+    "DELETED_SUCCESS": "Product deleted successfully",
+   "DELETE_FAILED": "Failed to delete product"
   },
   "LOGIN": {
-  "TITLE": "Sign in",
-  "USERNAME": "Username",
-  "PASSWORD": "Password",
-  "USERNAME_REQUIRED": "Username is required",
-  "PASSWORD_REQUIRED": "Password is required",
-  "SUBMIT": "Login",
-  "SUBMITTING": "Signing in..."
+    "TITLE": "Sign in",
+    "USERNAME": "Username",
+    "PASSWORD": "Password",
+    "USERNAME_REQUIRED": "Username is required",
+    "PASSWORD_REQUIRED": "Password is required",
+    "SUBMIT": "Login",
+    "SUBMITTING": "Signing in...",
+    "INVALID_CREDENTIALS": "Invalid credentials"
 },
 "DIALOG": {
   "DELETE_TITLE": "Confirmation",
   "DELETE_CONFIRM": "Are you sure you want to delete {{name}}?"
+},
+  "ERRORS": {
+    "ACCESS_DENIED": "Access denied",
+    "SERVER_UNREACHABLE": "Server unreachable",
+    "SESSION_EXPIRED": "Session expired, please login again"
+  }
 }
 
-}
+
+

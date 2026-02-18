@@ -12,6 +12,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
@@ -37,12 +38,13 @@ type CreateProductPayload = {
     ReactiveFormsModule,
     RouterLink,
 
-    TranslateModule, // ✅ translate pipe
+    TranslateModule,
 
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
     MatSnackBarModule,
+    MatProgressSpinnerModule, // ✅ NEW
   ],
   template: `
     <div class="max-w-2xl mx-auto">
@@ -61,7 +63,6 @@ type CreateProductPayload = {
         [formGroup]="form"
         (ngSubmit)="submit()"
       >
-        <!-- name -->
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>{{ 'PRODUCT.FIELDS.NAME' | translate }}</mat-label>
           <input matInput formControlName="name" />
@@ -74,14 +75,12 @@ type CreateProductPayload = {
           }
         </mat-form-field>
 
-        <!-- description -->
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>{{ 'PRODUCT.FIELDS.DESCRIPTION' | translate }}</mat-label>
           <textarea matInput rows="3" formControlName="description"></textarea>
         </mat-form-field>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- price -->
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>{{ 'PRODUCT.FIELDS.PRICE' | translate }}</mat-label>
             <input matInput type="number" formControlName="price" placeholder="0" />
@@ -94,7 +93,6 @@ type CreateProductPayload = {
             }
           </mat-form-field>
 
-          <!-- quantity -->
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>{{ 'PRODUCT.FIELDS.QUANTITY' | translate }}</mat-label>
             <input matInput type="number" formControlName="quantity" placeholder="0" />
@@ -114,9 +112,16 @@ type CreateProductPayload = {
             color="primary"
             type="submit"
             [disabled]="form.invalid || loading()"
+            class="min-w-[140px]"
           >
             @if (loading()) {
-              {{ 'COMMON.CREATING' | translate }}
+              <span class="inline-flex items-center gap-2">
+                <mat-progress-spinner
+                  diameter="18"
+                  mode="indeterminate"
+                ></mat-progress-spinner>
+                {{ 'COMMON.CREATING' | translate }}
+              </span>
             } @else {
               {{ 'COMMON.CREATE' | translate }}
             }

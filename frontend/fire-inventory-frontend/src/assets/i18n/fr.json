@@ -56,20 +56,33 @@
     "CREATE_FAILED": "Échec de création du produit",
     "LOAD_FAILED": "Échec du chargement du produit",
     "UPDATED_SUCCESS": "Produit mis à jour avec succès",
-    "UPDATE_FAILED": "Échec de la mise à jour"
+    "UPDATE_FAILED": "Échec de la mise à jour",
+    "DELETE_FORBIDDEN": "Accès refusé",
+    "DELETED_SUCCESS": "Produit supprimé avec succès",
+    "DELETE_FAILED": "Échec de la suppression du produit"
+
   },
   "LOGIN": {
-  "TITLE": "Connexion",
-  "USERNAME": "Nom d'utilisateur",
-  "PASSWORD": "Mot de passe",
-  "USERNAME_REQUIRED": "Nom d'utilisateur obligatoire",
-  "PASSWORD_REQUIRED": "Mot de passe obligatoire",
-  "SUBMIT": "Se connecter",
-  "SUBMITTING": "Connexion..."
+    "TITLE": "Connexion",
+    "USERNAME": "Nom d'utilisateur",
+    "PASSWORD": "Mot de passe",
+    "USERNAME_REQUIRED": "Nom d'utilisateur obligatoire",
+    "PASSWORD_REQUIRED": "Mot de passe obligatoire",
+    "SUBMIT": "Se connecter",
+    "SUBMITTING": "Connexion...",
+    "INVALID_CREDENTIALS": "Identifiants invalides"
 },
   "DIALOG": {
   "DELETE_TITLE": "Confirmation",
   "DELETE_CONFIRM": "Êtes-vous sûr de vouloir supprimer {{name}} ?"
+},
+
+  "ERRORS": {
+    "ACCESS_DENIED": "Accès refusé",
+    "SERVER_UNREACHABLE": "Serveur injoignable",
+    "SESSION_EXPIRED": "Session expirée, veuillez vous reconnecter"
+  }
 }
 
-}
+
+
