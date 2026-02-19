@@ -2,7 +2,7 @@
 
 🧠 Plateforme web full-stack pour gérer un inventaire de produits avec authentification JWT, API GraphQL, et interface Angular moderne.
 
-**Fire Inventory** est un projet académique qui implémente une architecture complète **Angular + FastAPI + GraphQL + PostgreSQL**, avec authentification sécurisée, gestion de rôles (ADMIN / USER), et une interface responsive avec support dark/light mode et internationalisation (FR / EN).
+**Fire Inventory** est une application full-stack **Angular + FastAPI + GraphQL + PostgreSQL**, avec authentification sécurisée, gestion de rôles (ADMIN / USER), et une interface responsive avec support dark/light mode et internationalisation (FR / EN).
 
 ---
 
@@ -138,6 +138,6 @@ Les tests Jest couvrent :
 
 ## ⚠️ Avertissement
 
-Fire Inventory nécessite une configuration de sécurité renforcée avant tout déploiement en production.  
+Fire Inventory est distribué tel quel et nécessite une configuration de sécurité renforcée avant tout déploiement en production.  
 Ce projet est distribué sous la licence **MIT**.  
 Vous êtes libre de le réutiliser, le modifier et le distribuer avec attribution.
