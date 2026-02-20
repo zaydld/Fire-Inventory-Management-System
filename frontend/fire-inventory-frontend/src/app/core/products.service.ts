@@ -70,7 +70,6 @@ export const DELETE_PRODUCT_MUTATION = gql`
 export class ProductsService {
   constructor(private apollo: Apollo) {}
 
-  // ✅ 1) products query
   
 
   // ✅ 2) create mutation

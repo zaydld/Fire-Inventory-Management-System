@@ -90,8 +90,16 @@ html.dark mat-nav-list a mat-icon {
 }
 
 /* Logout button mode sombre */
-html.dark button {
+html.dark .mat-sidenav button {
   color: #ffffff;
+}
+
+mat-toolbar .lang-btn {
+  color: #111827 !important; /* noir en mode clair */
+}
+
+html.dark .mat-toolbar .lang-btn {
+  color: #ffffff !important; /* blanc en mode sombre */
 }
 
 /* =========================

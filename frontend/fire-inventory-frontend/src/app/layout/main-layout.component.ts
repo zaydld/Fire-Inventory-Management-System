@@ -88,8 +88,7 @@ import { I18nService } from '../core/i18n.service';
           <button
             mat-button
             (click)="toggleLang()"
-            class="text-white font-semibold"
-            aria-label="Toggle language"
+            class="lang-btn font-semibold"
           >
             {{ lang.toUpperCase() }}
           </button>
